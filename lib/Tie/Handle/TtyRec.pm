@@ -23,6 +23,8 @@ sub TIEHANDLE {
     open(my $self, '>', $filename)
         or croak "Unable to open $filename for writing: $!";
 
+    $self->autoflush(1);
+
     bless $self, (ref $class || $class);
 }
 
@@ -32,7 +34,11 @@ sub READ {
 
 sub PRINT {
     my $self = shift;
-    print {$self} map {pack('VVV', gettimeofday, length), $_} @_;
+
+    local $\;
+    print {$self} map { pack('VVV', gettimeofday, length), $_ }
+                  grep { length }
+                  @_;
 }
 
 sub CLOSE {
@@ -46,11 +52,11 @@ Tie::Handle::TtyRec - write a ttyrec
 
 =head1 VERSION
 
-Version 0.01 released 11 Nov 07
+Version 0.02 released 13 Dec 07
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 

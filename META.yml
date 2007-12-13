@@ -21,4 +21,4 @@ requires:
   Tie::Handle: 0
   Time::HiRes: 0
   parent: 0
-version: 0.01
+version: 0.02

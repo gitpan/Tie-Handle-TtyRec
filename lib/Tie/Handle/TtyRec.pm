@@ -1,12 +1,13 @@
-#!perl
 package Tie::Handle::TtyRec;
 use strict;
 use warnings;
-use parent 'Tie::Handle';
+use base 'Tie::Handle';
 
 use Symbol;
 use Time::HiRes 'gettimeofday';
 use Carp 'croak';
+
+our $VERSION = '0.03';
 
 sub new {
     my ($class, $filename) = @_;
@@ -46,17 +47,13 @@ sub CLOSE {
     close $self;
 }
 
+1;
+
+__END__
+
 =head1 NAME
 
 Tie::Handle::TtyRec - write a ttyrec
-
-=head1 VERSION
-
-Version 0.02 released 13 Dec 07
-
-=cut
-
-our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -90,52 +87,14 @@ L<Term::TtyRec>, L<Term::TtyRec::Plus>
 
 =head1 AUTHOR
 
-Shawn M Moore, C<< <sartak at gmail.com> >>
-
-=head1 BUGS
-
-No known bugs.
-
-Please report any bugs through RT: email
-C<bug-tie-handle-ttyrec at rt.cpan.org>, or browse
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tie-Handle-TtyRec>.
-
-=head1 SUPPORT
-
-You can find this documentation for this module with the perldoc command.
-
-    perldoc Tie::Handle::TtyRec
-
-You can also look for information at:
-
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Tie-Handle-TtyRec>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Tie-Handle-TtyRec>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-Handle-TtyRec>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Tie-Handle-TtyRec>
-
-=back
+Shawn M Moore, C<sartak@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007 Shawn M Moore.
+Copyright 2007-2009 Shawn M Moore.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-
-1;
 

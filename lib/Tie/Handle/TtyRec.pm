@@ -7,21 +7,25 @@ use Symbol;
 use Time::HiRes 'gettimeofday';
 use Carp 'croak';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
-    my ($class, $filename) = @_;
+    my ($class, $filename, %params) = @_;
     my $symbol = Symbol::gensym;
 
-    tie(*$symbol, __PACKAGE__, $filename);
+    tie(*$symbol, __PACKAGE__, $filename, %params);
 
     return $symbol;
 }
 
 sub TIEHANDLE {
-    my ($class, $filename) = @_;
+    my ($class, $filename, %params) = @_;
 
-    open(my $self, '>', $filename)
+    my $mode = -p $filename    ? '+>'
+             : $params{append} ? '>>'
+             :                   '>';
+
+    open(my $self, $mode, $filename)
         or croak "Unable to open $filename for writing: $!";
 
     $self->autoflush(1);
@@ -30,16 +34,21 @@ sub TIEHANDLE {
 }
 
 sub READ {
-    croak "Cannot read from a Tie::Handle::TtyRec::Write";
+    croak "Cannot read from a Tie::Handle::TtyRec";
+}
+
+sub WRITE {
+    my $self = shift;
+    my ($buf, $length, $offset) = @_;
+    $offset ||= 0;
+    $length ||= length($buf) - $offset;
+    syswrite $self, pack('VVV', gettimeofday, $length)
+                  . substr($buf, $offset, $length);
 }
 
 sub PRINT {
     my $self = shift;
-
-    local $\;
-    print {$self} map { pack('VVV', gettimeofday, length), $_ }
-                  grep { length }
-                  @_;
+    $self->WRITE($_) for @_;
 }
 
 sub CLOSE {
@@ -69,8 +78,8 @@ data and can be a little fiddly. This module lets you focus on your
 application, instead of making sure your ttyrec headers are perfect.
 
 The usual way to use this module is through its C<new> interface. It will
-clobber the file you decide to record to. A way of allowing you to instead
-append will be included in a future version.
+clobber the file you decide to record to, unless you pass C<< append => 1 >> as
+additional arguments to C<new>.
 
 Each argument to print will be put into its own ttyrec frame, using the current
 time. So, the following will create three separate frames,
@@ -89,9 +98,13 @@ L<Term::TtyRec>, L<Term::TtyRec::Plus>
 
 Shawn M Moore, C<sartak@gmail.com>
 
+=head1 CONTRIBUTORS
+
+Jesse Luehrs, C<doy@tozt.net>
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007-2009 Shawn M Moore.
+Copyright 2007-2012 Shawn M Moore.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -18,3 +18,5 @@ META.yml
 README
 t/000-load.t
 t/001-basic.t
+t/002-append.t
+t/003-syswrite.t
